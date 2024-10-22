@@ -18,6 +18,9 @@ from weak_to_strong.loss import xent_loss
 from weak_to_strong.model import TransformerWithHead
 
 
+device = torch.device("cuda" if torch.cuda.is_available() else 
+                      ("mps" if torch.backends.mps.is_available() else "cpu"))
+
 @dataclass
 class ModelConfig:
     name: str
@@ -213,7 +216,7 @@ def train_and_save_model(
 
     already_trained = False
     # Load the model
-    if model_config.model_parallel:
+    if torch.cuda.is_available() and model_config.model_parallel:
         assert torch.cuda.device_count() > 1, f"you might want more gpus for {model_config.name}"
         model = TransformerWithHead.from_pretrained(
             model_config.name,
@@ -228,13 +231,13 @@ def train_and_save_model(
     else:
         model = TransformerWithHead.from_pretrained(
             model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
-        ).to("cuda")
+        ).to(device)
         already_trained = maybe_load_model(model)
         # data parallel:  currently not supported with model parallel
 
         minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)
 
-        if torch.cuda.device_count() > 1:
+        if torch.cuda.is_available() and torch.cuda.device_count() > 1:
             model = torch.nn.DataParallel(model, output_device=0)
             print(
                 "Using",

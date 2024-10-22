@@ -42,7 +42,8 @@ MODEL_CONFIGS = [
         # but if you have multiple it won't run without model_parallel because of the overhead of data
         # parallel training).
         model_parallel=(
-            torch.cuda.get_device_properties(0).total_memory < 35e9
+            torch.cuda.is_available()
+            and torch.cuda.get_device_properties(0).total_memory < 35e9
             and torch.cuda.device_count() > 1
         ),
     ),
@@ -52,7 +53,8 @@ MODEL_CONFIGS = [
         eval_batch_size=2,
         gradient_checkpointing=True,
         model_parallel=(
-            torch.cuda.get_device_properties(0).total_memory < 35e9
+            torch.cuda.is_available()
+            and torch.cuda.get_device_properties(0).total_memory < 35e9
             and torch.cuda.device_count() > 1
         ),
         custom_kwargs={
