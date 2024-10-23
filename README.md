@@ -1,3 +1,6 @@
+This is based on openai weak-to-strong repo. Just adding support to run on MacOS with mps.
+
+
 **STATUS**: This codebase is not well tested and does not use the exact same settings we used in the paper, but in our experience gives qualitatively similar results when using large model size gaps and multiple seeds.  Expected results can be found for two datasets below.
 
 # Weak-to-strong generalization
